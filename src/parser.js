@@ -3888,12 +3888,14 @@ function parse(input, options, program) {
   // Configure and start lexer
   lex = new Lexer(input, { indent: state.option.indent });
 
-  lex.on("warning", function (ev) {
-    warn(ev.code, { coord: { line: ev.line, ch: ev.character }, args: ev.data });
+  [ "warnings", "error" ].forEach(function (name) {
+    lex.on(name, function (ev) {
+      warn(ev.code, { coord: { line: ev.line, ch: ev.character }, args: ev.data });
+    });
   });
 
-  lex.on("error", function (ev) {
-    warn(ev.code, { coord: { line: ev.line, ch: ev.character }, args: ev.data });
+  [ "Identifier", "String", "Number" ].forEach(function (name) {
+    lex.on(name, function (ev) { emitter.emit(name, ev) });
   });
 
   lex.on("fatal", function (ev) {
@@ -3908,10 +3910,6 @@ function parse(input, options, program) {
   lex.on("NBSP", function (ev) {
     if (!state.option.nonbsp) return;
     warn("W125", { coord: { line: ev.line, ch: ev.character } });
-  });
-
-  [ "Identifier", "String", "Number" ].forEach(function (name) {
-    lex.on(name, function (ev) { emitter.emit(name, ev) });
   });
 
   lex.start();
