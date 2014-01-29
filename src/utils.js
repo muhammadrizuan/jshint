@@ -1,6 +1,6 @@
 "use strict";
 
-var _ = require("underscore");
+var _ = require("lodash");
 
 function setprop(funct, name, values) {
   if (!funct["(properties)"][name])

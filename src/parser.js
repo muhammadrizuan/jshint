@@ -4,7 +4,7 @@
 
 "use strict";
 
-var _        = require("underscore");
+var _        = require("lodash");
 var events   = require("events");
 var vars     = require("./vars.js");
 var messages = require("./messages.js");
@@ -2399,7 +2399,8 @@ function doFunction(name, statement, generator, fatarrowparams) {
   // arguments to the undefs array and here we undo that.
 
   state.undefs = _.filter(state.undefs, function (item) {
-    return !_.contains(_.union(fatarrowparams), item[2].token);
+    var params = Array.isArray(fatarrowparams) ? fatarrowparams : [fatarrowparams];
+    return !_.contains(params, item[2].token);
   });
 
   block(false, true, true, fatarrowparams ? true : false);
@@ -3888,7 +3889,7 @@ function parse(input, options, program) {
   // Configure and start lexer
   lex = new Lexer(input, { indent: state.option.indent });
 
-  [ "warnings", "error" ].forEach(function (name) {
+  [ "warning", "error" ].forEach(function (name) {
     lex.on(name, function (ev) {
       warn(ev.code, { coord: { line: ev.line, ch: ev.character }, args: ev.data });
     });

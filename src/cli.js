@@ -1,6 +1,6 @@
 "use strict";
 
-var _           = require("underscore");
+var _           = require("lodash");
 var cli         = require("cli");
 var path        = require("path");
 var shjs        = require("shelljs");

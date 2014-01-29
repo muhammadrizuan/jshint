@@ -4,7 +4,7 @@
 
 "use strict";
 
-var _      = require("underscore");
+var _      = require("lodash");
 var events = require("events");
 var reg    = require("./reg.js");
 
@@ -131,7 +131,7 @@ Lexer.prototype = {
    * listener.
    */
   trigger: function () {
-    this.emitter.emit.apply(this.emitter, Array.prototype.slice.call(arguments));
+    this.emitter.emit.apply(this.emitter, _.toArray(arguments));
   },
 
   /*
