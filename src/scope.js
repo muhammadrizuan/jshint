@@ -67,4 +67,24 @@ function last(env, cond) {
   return id != null ? env.pool[id] : null;
 }
 
-[ create, push, pop, last ].forEach(function (fn) { exports[fn.name] = fn });
+// type: string (var, let)
+function vardecl(env, name, type) {
+  // Get the last block from the stack. If variable is declared
+  // with the "var" keyword, get the last function block.
+  var cur = last(env, function (scope) {
+    return type === "var" ? scope.type === "func" : true;
+  });
+
+  cur.vars.decl[name] = { type: type, unused: true, shadows: [] };
+
+  // 1. add variable declaration to this scope. if type = var
+  //    and we're in a block scope, add variable to the closest
+  //    function scope.
+  // 2. go thru this and child scopes and mark all undef uses
+  //    as ok.
+  // 3. go thru all parent scopes and mark all variable declarations
+  //    with the same name as shadowed and unused (unless there are
+  //    uses outside of the scope).
+}
+
+[ create, push, pop, last, vardecl ].forEach(function (fn) { exports[fn.name] = fn });
