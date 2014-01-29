@@ -28,7 +28,7 @@
 
 /*jshint node: true, eqnull: true*/
 
-var _ = require("underscore");
+var _ = require("lodash");
 var jshint = require('../../src/jshint.js');
 
 if (exports.setup === undefined || exports.setup === null) {

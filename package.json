@@ -34,7 +34,7 @@
 
   "dependencies": {
     "shelljs":     "0.1.x",
-    "underscore":  "1.4.x",
+    "lodash":      "2.4.x",
     "cli":         "0.4.x",
     "minimatch":   "0.x.x",
     "htmlparser2": "3.3.x",
@@ -63,6 +63,7 @@
     "unused":    true,
     "onecase":   true,
     "lastsemic": true,
+    "eqnull":    true,
     "newcap":    false,
     "maxlen":    100,
     "indent":    2

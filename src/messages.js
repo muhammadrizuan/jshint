@@ -1,6 +1,6 @@
 "use strict";
 
-var _ = require("underscore");
+var _ = require("lodash");
 
 function make(type, messages) {
   return _.reduce(_.pairs(messages), function (dest, data) {

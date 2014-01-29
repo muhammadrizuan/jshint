@@ -1,6 +1,6 @@
 "use strict";
 
-var _ = require("underscore");
+var _ = require("lodash");
 
 /*
 var scope = [
@@ -37,8 +37,14 @@ function create() {
   return env;
 }
 
+// type: string (func, block)
 function push(env, name, type) {
-  var id = env.pool.push({ name: name, children: [], vars: {}, type: type }) - 1;
+  var id = env.pool.push({
+    name: name,
+    children: [],
+    vars: { decl: {}, uses: {} },
+    type: type
+  }) - 1;
 
   env.stack.forEach(function (par) {
     env.pool[par].children.push(id);
@@ -53,8 +59,12 @@ function pop(env) {
   return env;
 }
 
-function last(env) {
-  return env.pool[_.last(env.stack)];
+function last(env, cond) {
+  var id = _.findLast(env.stack, function (id) {
+    return cond ? cond(env.pool[id]) : true;
+  });
+
+  return id != null ? env.pool[id] : null;
 }
 
 [ create, push, pop, last ].forEach(function (fn) { exports[fn.name] = fn });

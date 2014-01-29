@@ -1,6 +1,6 @@
 "use strict";
 
-var _      = require("underscore");
+var _      = require("lodash");
 var parser = require("./parser.js");
 var style  = require("./style.js");
 var types  = require("./types.js");
