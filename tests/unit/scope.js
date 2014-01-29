@@ -1,5 +1,6 @@
 "use strict";
 
+var _ = require("lodash");
 var scope = require("../../src/scope.js");
 
 // function main() {
@@ -30,6 +31,41 @@ exports.testCreate = function (test) {
 
   test.deepEqual(env.pool[0].children, [1, 2]);
   test.deepEqual(env.pool[1].children, [2]);
+
+  test.done();
+};
+
+// function main() {
+//   var a;
+//   let b;
+//   if (true) {
+//      var c;
+//      let d;
+//   }
+// }
+
+exports.testVars = function (test) {
+  var env = scope.create();
+
+  function isdecl(name) { return env.last().vars.decl[name] != null }
+
+  env.push("main", "func");
+  env.vardecl("a", "var");
+  env.vardecl("b", "let");
+  env.push("if", "block");
+  env.vardecl("c", "var");
+  env.vardecl("d", "let");
+
+  test.ok(isdecl("d"));
+  test.ok(!isdecl("c"));
+
+  env.pop();
+  test.ok(isdecl("a"));
+  test.ok(isdecl("b"));
+  test.ok(isdecl("c"));
+
+  env.pop();
+  test.strictEqual(_.size(env.last().vars.decl), 0);
 
   test.done();
 };
