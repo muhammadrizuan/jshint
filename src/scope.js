@@ -50,6 +50,7 @@ function push(env, name, type) {
     env.pool[par].children.push(id);
   });
 
+  env.id = id;
   env.stack.push(id);
   return env;
 }
@@ -67,6 +68,14 @@ function last(env, cond) {
   return id != null ? env.pool[id] : null;
 }
 
+function eachChild(env, scope, fn) {
+  scope.children.forEach(function (id) {
+    var child = env.pool[id];
+    fn(child);
+    eachChild(env, child, fn);
+  });
+}
+
 // type: string (var, let)
 function vardecl(env, name, type) {
   // Get the last block from the stack. If variable is declared
@@ -77,14 +86,30 @@ function vardecl(env, name, type) {
 
   cur.vars.decl[name] = { type: type, unused: true, shadows: [] };
 
-  // 1. add variable declaration to this scope. if type = var
-  //    and we're in a block scope, add variable to the closest
-  //    function scope.
-  // 2. go thru this and child scopes and mark all undef uses
-  //    as ok.
+  eachChild(env, cur, function (child) {
+    if (child.vars.uses[name]) {
+      child.vars.uses[name].decl = cur;
+      cur.vars.decl[name].unused = false;
+    }
+  });
+
   // 3. go thru all parent scopes and mark all variable declarations
   //    with the same name as shadowed and unused (unless there are
   //    uses outside of the scope).
 }
 
-[ create, push, pop, last, vardecl ].forEach(function (fn) { exports[fn.name] = fn });
+function getdecl(env, name) {
+  return last(env, function (scope) { return scope.vars.decl[name]; });
+}
+
+function varuse(env, name) {
+  var cur   = last(env);
+  var scope = getdecl(env, name);
+
+  if (scope)
+    scope.decl[name].unused = false;
+
+  cur.vars.uses[name] = { decl: scope ? scope.id : null };
+}
+
+[ create, push, pop, last, vardecl, varuse ].forEach(function (fn) { exports[fn.name] = fn });

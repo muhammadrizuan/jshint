@@ -44,7 +44,7 @@ exports.testCreate = function (test) {
 //   }
 // }
 
-exports.testVars = function (test) {
+exports.testDeclarations = function (test) {
   var env = scope.create();
 
   function isdecl(name) { return env.last().vars.decl[name] != null }
@@ -66,6 +66,46 @@ exports.testVars = function (test) {
 
   env.pop();
   test.strictEqual(_.size(env.last().vars.decl), 0);
+
+  test.done();
+};
+
+// function main() {
+//   b = 1;
+//   if (true) a = 1;
+//   var a;
+//   function bar() { d = 1; }
+//   var d;
+//   var e;
+// }
+
+exports.testUses = function (test) {
+  var env = scope.create();
+
+  function getuse(name) { return env.last().vars.uses[name] }
+  function getdecl(name) { return env.last().vars.decl[name] }
+
+  env.push("main", "func");
+  env.varuse("b");
+  test.ok(getuse("b").decl == null);
+
+  env.push("if", "block");
+  env.varuse("a");
+  test.ok(getuse("a").decl == null);
+  env.pop();
+
+  env.vardecl("a", "var");
+  test.ok(!getdecl("a").unused);
+
+  env.push("bar", "func");
+  env.varuse("d");
+  test.ok(getuse("d").decl == null);
+  env.pop();
+
+  env.vardecl("d");
+  env.vardecl("e");
+  test.ok(!getdecl("d").unused);
+  test.ok(getdecl("e").unused);
 
   test.done();
 };
