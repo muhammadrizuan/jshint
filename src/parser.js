@@ -38,6 +38,7 @@ var varmap = {
 var syntax   = {};
 var emitter  = new events.EventEmitter();
 var state    = {};
+var env      = require("./scope.js").create();
 
 var api = {
   isStrictMode: function () {
@@ -2379,12 +2380,12 @@ function doFunction(name, statement, generator, fatarrowparams) {
 
   f = funct;
   state.tokens.curr.funct = funct;
-
   state.functions.push(funct);
 
-  if (name) {
+  if (name)
     addlabel(name, { type: "function" });
-  }
+
+  env.push(name || "(anonymous)", "func");
 
   var params = funct["(params)"] = functionparams(fatarrowparams);
   params = params || [];
@@ -2421,6 +2422,7 @@ function doFunction(name, statement, generator, fatarrowparams) {
 
   funct["(unusedOption)"] = state.option.unused;
 
+  env.pop();
   scope = oldScope;
   state.option = oldOption;
   state.ignored = oldIgnored;
@@ -2753,14 +2755,14 @@ var conststatement = stmt("const", function (prefix) {
     }
 
     tokens.forEach(function (t) {
-      if (funct[t.id] === "const") {
+      if (funct[t.id] === "const")
         warn("E011", { token: null, args: [t.id] });
-      }
-      if (funct["(global)"] && predefined[t.id] === false) {
+
+      if (funct["(global)"] && predefined[t.id] === false)
         warn("W079", { token: t.token, args: [t.id] });
-      }
+
       if (t.id) {
-        addlabel(t.id, { type: "const", token: t.token, unused: true });
+        env.vardecl(t.id, "const", t.token);
         names.push(t.token);
       }
     });
@@ -2823,7 +2825,7 @@ var varstatement = stmt("var", function (prefix) {
         warn("W079", { token: t.token, args: [t.id] });
       }
       if (t.id) {
-        addlabel(t.id, { type: "unused", token: t.token });
+        env.vardecl(t.id, "var", t.token);
         names.push(t.token);
       }
     });
@@ -2897,7 +2899,7 @@ var letstatement = stmt("let", function (prefix) {
         warn("W079", { token: t.token, args: [t.id] });
       }
       if (t.id && !funct["(nolet)"]) {
-        addlabel(t.id, { type: "unused", token: t.token, islet: true });
+        env.vardecl(t.id, "let", t.token);
         names.push(t.token);
       }
     });

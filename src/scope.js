@@ -77,14 +77,14 @@ function eachChild(env, scope, fn) {
 }
 
 // type: string (var, let)
-function vardecl(env, name, type) {
+function vardecl(env, name, type, token) {
   // Get the last block from the stack. If variable is declared
   // with the "var" keyword, get the last function block.
   var cur = last(env, function (scope) {
     return type === "var" ? scope.type === "func" : true;
   });
 
-  cur.vars.decl[name] = { type: type, unused: true, shadows: [] };
+  cur.vars.decl[name] = { type: type, unused: true, shadows: [], token: token };
 
   eachChild(env, cur, function (child) {
     if (child.vars.uses[name]) {
@@ -93,9 +93,9 @@ function vardecl(env, name, type) {
     }
   });
 
-  // 3. go thru all parent scopes and mark all variable declarations
-  //    with the same name as shadowed and unused (unless there are
-  //    uses outside of the scope).
+  // TODO: go thru all parent scopes and mark all variable declarations
+  //       with the same name as shadowed and unused (unless there are
+  //       uses outside of the scope).
 }
 
 function getdecl(env, name) {
