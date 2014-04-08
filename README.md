@@ -1,4 +1,4 @@
-JSHint, A Static Code Analysis Tool for JavaScript
+wanJSHint, A Static Code Analysis Tool for JavaScript
 --------------------------------------------------
 
 \[ [Use it online](http://jshint.com/) •  [About](http://jshint.com/about/) •
